@@ -1,15 +1,25 @@
 <MonitorGrafico>:
     orientation: 'vertical'
     padding: 10
-    spacing: 5
-    canvas.before:
-        Color:
-            rgba: 0.12, 0.12, 0.12, 1  # Gris muy oscuro
-        RoundedRectangle:
-            pos: self.pos
-            size: self.size
-            radius: [5,]
+    # Definimos las propiedades iniciales del Graph aquí
+    graph: graph_id 
 
     BoxLayout:
         id: graph_container
-        # El widget Graph se insertará aquí mediante Python
+        Graph:
+            id: graph_id
+            xlabel: 't (s)'
+            ylabel: 'rad/s'
+            xmin: 0
+            xmax: 10
+            ymin: 0
+            ymax: 1
+            x_grid: True
+            y_grid: True
+            x_grid_label: True
+            y_grid_label: True
+            padding: 5
+            label_options: {'color': [1, 1, 1, 1], 'bold': True}
+            # Podemos definir los ticks iniciales aquí
+            x_ticks_major: 5
+            y_ticks_major: 0.2

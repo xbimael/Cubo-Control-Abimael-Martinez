@@ -1,0 +1,70 @@
+<ModoVelocityActions>:
+    orientation: 'vertical'
+    padding: 15
+    spacing: 10
+    
+    Label:
+        text: "VELOCITY CONTROL ACTIONS"
+        size_hint_y: None
+        height: '30dp'
+        bold: True
+        color: (0.8, 0.4, 0, 1)
+
+    GridLayout:
+        cols: 2
+        spacing: 10
+        row_default_height: '35dp'
+        row_force_default: True
+
+        Label:
+            text: "Kp:"
+        TextInput:
+            id: kp_input
+            text: "1.0"
+            multiline: False
+            input_filter: 'float'
+
+        Label:
+            text: "Ki:"
+        TextInput:
+            id: ki_input
+            text: "0.1"
+            multiline: False
+            input_filter: 'float'
+
+        Label:
+            text: "Kd:"
+        TextInput:
+            id: kd_input
+            text: "0.01"
+            multiline: False
+            input_filter: 'float'
+
+        Label:
+            text: "Ref (Voltios):" # <--- CAMBIADO AQUÍ
+        TextInput:
+            id: ref_input # <--- ID RENOMBRADO PARA MAYOR CLARIDAD
+            text: "5.0" # <--- TEXTO POR DEFECTO AJUSTADO A VOLTIOS
+            multiline: False
+            input_filter: 'float'
+
+        Label:
+            text: "Tiempo (s):"
+        TextInput:
+            id: t_input
+            text: "10.0"
+            multiline: False
+            input_filter: 'float'
+
+    Widget:
+        size_hint_y: 1
+
+    Button:
+        text: "EJECUTAR ACCIONES"
+        size_hint_y: None
+        height: '50dp'
+        bold: True
+        background_normal: ''
+        background_color: (0.8, 0.4, 0, 1) 
+        # LLAMADA ACTUALIZADA CON EL NUEVO ID
+        on_release: root.ejecutar_velocity_actions(kp_input.text, ki_input.text, kd_input.text, ref_input.text, t_input.text)
