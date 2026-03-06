@@ -3,6 +3,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
 from kivy_garden.graph import MeshLinePlot, PointPlot
 from kivy.properties import ObjectProperty, ListProperty
+from utils import abrir_ventana_interactiva
 
 Builder.load_file('monitor_grafico.kv')
 
@@ -18,6 +19,8 @@ class MonitorGrafico(BoxLayout):
         self.plot_cursor = PointPlot(color=[1, 1, 0, 1])
         self.plot_cursor.point_size = 5
         self.experiment = [] 
+        self.ultimos_datos_recibidos = []
+        self.ultima_referencia = 0
         
         # Un pequeño truco: usamos Clock para evitar el error de inicialización
         from kivy.clock import Clock
@@ -39,7 +42,6 @@ class MonitorGrafico(BoxLayout):
         self.graph.ymin, self.graph.ymax = 0, 1
         self.actualizar_marcas()
 
-    # --- NUEVO MÉTODO PARA RECIBIR LOS 4 DATOS DE MATLAB ---
     def actualizar_datos_completos(self, tiempos, voltajes, salidas, filtrados, ref_val=None):
         self.experiment = list(zip(tiempos, voltajes, salidas, filtrados))
         
@@ -50,6 +52,10 @@ class MonitorGrafico(BoxLayout):
         if ref_val is not None and tiempos:
             # Creamos dos puntos: uno al inicio (0, ref) y otro al final (t_final, ref)
             self.plot_ref.points = [(0, ref_val), (tiempos[-1], ref_val)]
+
+        # Guardamos los datos en el formato que espera la función de utils (lista de tuplas)
+        self.ultimos_datos_recibidos = list(zip(tiempos, filtrados))
+        self.ultima_referencia = ref_val
 
     def actualizar_marcas(self):
         if not self.graph: return
@@ -144,6 +150,15 @@ class MonitorGrafico(BoxLayout):
                 self.ids.lbl_punto_x.text = f"Tiempo: {punto_seleccionado[0]:.3f} s"
                 self.ids.lbl_punto_y.text = f"Salida: {punto_seleccionado[1]:.3f} rad/s"
             
-            return True
-            
+            return True            
         return super().on_touch_down(touch)
+    
+    def abrir_grafico_externo(self):
+        if self.ultimos_datos_recibidos:
+            abrir_ventana_interactiva(
+                self.ultimos_datos_recibidos, 
+                self.ultima_referencia,
+                titulo="Análisis de Control Externo"
+            )
+        else:
+            print("Aviso: No hay datos acumulados en el monitor todavía.")

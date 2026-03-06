@@ -6,6 +6,22 @@
 
     BoxLayout:
         id: graph_container
+        orientation: 'vertical'
+
+        Button:
+            size_hint: (None, None)
+            size: ("20dp", "20dp")
+            on_release: root.abrir_grafico_externo()
+            background_color: (1, 1, 1, 1)
+            pos_hint: {"right": 1}
+            
+            Image:
+                source: 'lupa.png'
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+                size: ("16dp", "16dp") # El icono es un poco más pequeño que el área clicable
+                allow_stretch: True
+
         Graph:
             id: graph_id
             xlabel: 't (s)'
@@ -75,3 +91,4 @@
                 text_size: self.size
                 halign: 'center'
                 valign: 'middle'
+        

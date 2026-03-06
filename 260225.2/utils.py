@@ -30,3 +30,29 @@ def crear_ecuacion_latex(texto_latex, altura='100dp'):
     textura = CoreImage(buf, ext='png').texture
     return KivyImage(texture=textura, size_hint_y=None, height=altura)
 
+def abrir_ventana_interactiva(datos_acumulados, referencia, titulo="Análisis de Datos"):    
+    # Cambiamos el motor de 'Agg' (estático) a uno interactivo
+    # TkAgg viene instalado por defecto con Python
+    matplotlib.use('TkAgg', force=True) 
+    import matplotlib.pyplot as plt # Re-importar para aplicar el cambio
+    # -------------------------
+
+    if not datos_acumulados:
+        print("No hay datos para mostrar")
+        return
+
+    # Extraemos los datos (asumiendo que vienen como lista de tuplas o zip)
+    tiempos, salidas = zip(*datos_acumulados)
+    
+    plt.figure(titulo, figsize=(9, 5))
+    plt.plot(tiempos, salidas, 'b-', label='Respuesta')
+    plt.axhline(y=referencia, color='r', linestyle='--', label='Ref')
+    plt.grid(True)
+    plt.legend()
+    
+    plt.show() # Ahora sí abrirá la ventana
+    
+    # --- IMPORTANTE ---
+    # Una vez cerrada la ventana, volvemos a poner 'Agg' 
+    # para que las fórmulas de LaTeX no den problemas luego
+    matplotlib.use('Agg', force=True)

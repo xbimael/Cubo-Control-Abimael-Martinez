@@ -120,6 +120,6 @@ class TesterApp(App):
         
         textura = CoreImage(buf, ext='png').texture
         return KivyImage(texture=textura, size_hint_y=None, height=altura)
-
+    
 if __name__ == '__main__':
     TesterApp().run()
