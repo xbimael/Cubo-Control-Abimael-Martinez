@@ -35,7 +35,7 @@ class Tab(MDFloatLayout, MDTabsBase):
     '''Clase para el contenido de cada pestaña.'''
     pass
 
-class TesterApp(MDApp): # <--- Cambio a MDApp
+class TesterApp(MDApp):
     def build(self):
         # 1. Configuración del Tema Material Design
         self.color_resaltado = [0.12, 0.43, 0.46, 1]  # #1E6D76

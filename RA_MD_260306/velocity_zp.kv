@@ -1,6 +1,6 @@
 #:import MonitorGrafico monitor_grafico.MonitorGrafico
 
-<ModoPositionZP>:
+<ModoVelocityZP>:
     grafica_ref: grafico_ensayo
     orientation: 'horizontal'
     spacing: dp(15)
@@ -17,7 +17,7 @@
         spacing: dp(10)
 
         MDLabel:
-            text: "POSITION CONTROL (ZEROS/POLES)"
+            text: "VELOCITY CONTROL (ZEROS/POLES)"
             size_hint_y: None
             height: dp(40)
             halign: "center"
@@ -25,10 +25,10 @@
             theme_text_color: "Primary"
 
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.01
             
         MDLabel:
-            text: "This operation mode allows you to control the DC-motor by means of a PID controller defining its ceros and poles"
+            text: "This operation mode allows you to control the DC-motor by means of a PID controller defining its ceros and poles."
             halign: "justify"
             font_style: "Body2"
             theme_text_color: "Secondary" # Gris profesional, no distrae
@@ -37,9 +37,9 @@
             padding: [dp(10), 0]
 
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.02
 
-        # Contenedor para la fórmula LaTeX (Función de transferencia)
+        # Contenedor para la fórmula LaTeX
         MDBoxLayout:
             id: contenedor_export_latex
             size_hint_y: None
@@ -47,11 +47,11 @@
             padding: dp(5)
             md_bg_color: (0, 0, 0, 0.1)
             radius: [dp(10),]
-
+            
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.02
 
-        # Grid de Parámetros del Controlador
+        # Parámetros del Controlador en Grid
         MDGridLayout:
             cols: 2
             spacing: dp(12)
@@ -59,7 +59,7 @@
             height: self.minimum_height
 
             MDTextField:
-                id: k_in
+                id: k_input
                 text: "1"
                 hint_text: "Gain, K"
                 mode: "rectangle"
@@ -67,31 +67,31 @@
                 input_filter: 'float'
 
             MDTextField:
-                id: c_in
+                id: c_input
                 text: "0"
-                hint_text: "Zero C"
+                hint_text: "Zero, C"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
 
             MDTextField:
-                id: p_in
+                id: p_input
                 text: "0"
                 hint_text: "Pole, P"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
-                
+
             MDTextField:
-                id: ci_in
+                id: ci_input
                 text: "0"
                 hint_text: "Zero, Ci"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
-                
+
             MDTextField:
-                id: pi_in
+                id: pi_input
                 text: "0"
                 hint_text: "Pole, Pi"
                 mode: "rectangle"
@@ -99,23 +99,22 @@
                 input_filter: 'float'
 
             MDTextField:
-                id: ref_in
+                id: ref_input
                 text: "3.14"
-                hint_text: "Position reference (rad)"
+                hint_text: "Velocity reference (rad/s)"
                 mode: "rectangle"
-                icon_left: "target"
+                icon_left: "timer-outline"
                 input_filter: 'float'
 
-        # Campo de tiempo destacado al final
+        # Campo de tiempo destacado
         MDTextField:
-            id: t_in
+            id: t_input
             text: "3"
             hint_text: "Experiment time (s)"
             mode: "rectangle"
-            icon_left: "timer-outline"
+            icon_left: "timer-sand-complete"
             input_filter: 'float'
 
-        # Espacio para empujar el botón
         MDFloatLayout:
             size_hint_y: 1
 
@@ -127,11 +126,11 @@
             elevation: 0          
             md_bg_color: app.color_resaltado
             text_color: 1, 1, 1, 1 
-            on_release: root.ejecutar_position_zp(k_in.text, c_in.text, p_in.text, ci_in.text, pi_in.text, ref_in.text, t_in.text)
+            on_release: root.ejecutar_velocity_zp(k_input.text, c_input.text, p_input.text, ci_input.text, pi_input.text, ref_input.text, t_input.text)
 
     MDBoxLayout:
         orientation: 'vertical'
         MonitorGrafico:
             id: grafico_ensayo
-            unidad_y: "rad"
+            unidad_y: "rad/s"
             size_hint_y: 0.6

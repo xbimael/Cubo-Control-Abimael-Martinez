@@ -1,6 +1,6 @@
 #:import MonitorGrafico monitor_grafico.MonitorGrafico
 
-<ModoVelocityZP>:
+<ModoVelocityActions>:
     grafica_ref: grafico_ensayo
     orientation: 'horizontal'
     spacing: dp(15)
@@ -17,7 +17,7 @@
         spacing: dp(10)
 
         MDLabel:
-            text: "VELOCITY CONTROL (ZEROS/POLES)"
+            text: "VELOCITY CONTROL (ACTIONS)"
             size_hint_y: None
             height: dp(40)
             halign: "center"
@@ -25,10 +25,10 @@
             theme_text_color: "Primary"
 
         Widget:
-            size_hint_y: 0.1
-            
+            size_hint_y: 0.01
+
         MDLabel:
-            text: "This operation mode allows you to control the DC-motor by means of a PID controller defining its ceros and poles."
+            text: "This operation mode allows you to control the DC-motor by means of a PID controller written in term of the propotional, integral and derivative action"
             halign: "justify"
             font_style: "Body2"
             theme_text_color: "Secondary" # Gris profesional, no distrae
@@ -37,7 +37,7 @@
             padding: [dp(10), 0]
 
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.02
 
         # Contenedor para la fórmula LaTeX
         MDBoxLayout:
@@ -47,11 +47,11 @@
             padding: dp(5)
             md_bg_color: (0, 0, 0, 0.1)
             radius: [dp(10),]
-            
-        Widget:
-            size_hint_y: 0.1
 
-        # Parámetros del Controlador en Grid
+        Widget:
+            size_hint_y: 0.02
+
+        # Parámetros PID en cuadrícula
         MDGridLayout:
             cols: 2
             spacing: dp(12)
@@ -59,41 +59,25 @@
             height: self.minimum_height
 
             MDTextField:
-                id: k_input
+                id: kp_input
                 text: "1"
-                hint_text: "Gain, K"
+                hint_text: "Proportional constant, Kp"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
 
             MDTextField:
-                id: c_input
+                id: ki_input
                 text: "0"
-                hint_text: "Zero, C"
+                hint_text:  "Integral constant, Ki"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
 
             MDTextField:
-                id: p_input
+                id: kd_input
                 text: "0"
-                hint_text: "Pole, P"
-                mode: "rectangle"
-                icon_left: 'blank'
-                input_filter: 'float'
-
-            MDTextField:
-                id: ci_input
-                text: "0"
-                hint_text: "Zero, Ci"
-                mode: "rectangle"
-                icon_left: 'blank'
-                input_filter: 'float'
-
-            MDTextField:
-                id: pi_input
-                text: "0"
-                hint_text: "Pole, Pi"
+                hint_text:  "Derivative constant, Kd"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
@@ -106,15 +90,16 @@
                 icon_left: "timer-outline"
                 input_filter: 'float'
 
-        # Campo de tiempo destacado
+        # Campo de tiempo
         MDTextField:
             id: t_input
             text: "3"
             hint_text: "Experiment time (s)"
             mode: "rectangle"
-            icon_left: "timer-sand-complete"
+            icon_left: "timer-sand"
             input_filter: 'float'
 
+        # Espaciador
         MDFloatLayout:
             size_hint_y: 1
 
@@ -126,11 +111,11 @@
             elevation: 0          
             md_bg_color: app.color_resaltado
             text_color: 1, 1, 1, 1 
-            on_release: root.ejecutar_velocity_zp(k_input.text, c_input.text, p_input.text, ci_input.text, pi_input.text, ref_input.text, t_input.text)
+            on_release: root.ejecutar_velocity_actions(kp_input.text, ki_input.text, kd_input.text, ref_input.text, t_input.text)
 
     MDBoxLayout:
-        orientation: 'vertical'
         MonitorGrafico:
             id: grafico_ensayo
             unidad_y: "rad/s"
-            size_hint_y: 0.6
+
+    

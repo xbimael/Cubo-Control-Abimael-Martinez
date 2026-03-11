@@ -1,6 +1,6 @@
 #:import MonitorGrafico monitor_grafico.MonitorGrafico
 
-<ModoVelocityActions>:
+<ModoPositionActions>:
     grafica_ref: grafico_ensayo
     orientation: 'horizontal'
     spacing: dp(15)
@@ -17,7 +17,7 @@
         spacing: dp(10)
 
         MDLabel:
-            text: "VELOCITY CONTROL (ACTIONS)"
+            text: "POSITION CONTROL (ACTIONS)"
             size_hint_y: None
             height: dp(40)
             halign: "center"
@@ -25,7 +25,7 @@
             theme_text_color: "Primary"
 
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.01
             
         MDLabel:
             text: "This operation mode allows you to control the DC-motor by means of a PID controller written in term of the propotional, integral and derivative action"
@@ -37,9 +37,10 @@
             padding: [dp(10), 0]
 
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.02
 
         # Contenedor para la fórmula LaTeX
+        # Mantenemos el ID para que tu Python pueda inyectar la imagen
         MDBoxLayout:
             id: contenedor_export_latex
             size_hint_y: None
@@ -49,12 +50,12 @@
             radius: [dp(10),]
 
         Widget:
-            size_hint_y: 0.1
+            size_hint_y: 0.02
 
-        # Parámetros PID en cuadrícula
+        # Cuadrícula de parámetros PID
         MDGridLayout:
             cols: 2
-            spacing: dp(12)
+            spacing: dp(15)
             size_hint_y: None
             height: self.minimum_height
 
@@ -69,7 +70,7 @@
             MDTextField:
                 id: ki_input
                 text: "0"
-                hint_text:  "Integral constant, Ki"
+                hint_text: "Integral constant, Ki"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
@@ -77,7 +78,7 @@
             MDTextField:
                 id: kd_input
                 text: "0"
-                hint_text:  "Derivative constant, Kd"
+                hint_text: "Derivative constant, Kd"
                 mode: "rectangle"
                 icon_left: 'blank'
                 input_filter: 'float'
@@ -85,21 +86,23 @@
             MDTextField:
                 id: ref_input
                 text: "3.14"
-                hint_text: "Velocity reference (rad/s)"
+                hint_text: "Position reference (rad)"
                 mode: "rectangle"
-                icon_left: "timer-outline"
+                icon_left: "target"
                 input_filter: 'float'
 
-        # Campo de tiempo
+        # Campo de tiempo debajo de la cuadrícula
         MDTextField:
             id: t_input
             text: "3"
             hint_text: "Experiment time (s)"
             mode: "rectangle"
-            icon_left: "timer-sand"
+            icon_left: "timer-outline"
             input_filter: 'float'
+            size_hint_y: None
+            height: dp(60)
 
-        # Espaciador
+        # Espacio flexible
         MDFloatLayout:
             size_hint_y: 1
 
@@ -111,11 +114,13 @@
             elevation: 0          
             md_bg_color: app.color_resaltado
             text_color: 1, 1, 1, 1 
-            on_release: root.ejecutar_velocity_actions(kp_input.text, ki_input.text, kd_input.text, ref_input.text, t_input.text)
+            on_release: root.ejecutar_position_actions(kp_input.text, ki_input.text, kd_input.text, ref_input.text, t_input.text)
 
     MDBoxLayout:
+        orientation: 'vertical'
         MonitorGrafico:
             id: grafico_ensayo
-            unidad_y: "rad/s"
+            unidad_y: "rad"
+            size_hint_y: 0.6
 
-    
+        

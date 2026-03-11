@@ -23,7 +23,7 @@ class ModoVelocityActions(BoxLayout):
 
     def _insertar_ecuacion(self, dt):
         # Definimos la fórmula
-        formula = r'R(s) = k_p + \frac{k_i}{s} + k_d \cdot s'
+        formula = r'R(s) = k_p + k_i \cdot \frac{1}{s} + k_d \cdot s'
         widget_latex = crear_ecuacion_latex(formula, altura='90dp')
         self.ids.contenedor_export_latex.add_widget(widget_latex)
 

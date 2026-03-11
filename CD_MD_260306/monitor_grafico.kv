@@ -27,7 +27,7 @@
                 md_bg_color: 1, 1, 1, 0.9
                 radius: [1,]
                 elevation: 0
-                orientation: 'horizontal' # <--- CAMBIO A HORIZONTAL
+                orientation: 'horizontal'
                 padding: [dp(10), 0, dp(10), 0]
                 spacing: dp(15)
                 
@@ -37,7 +37,7 @@
                         rgba: 0.4, 0.4, 0.4, 0.8 
                     Line:
                         width: 1.1
-                        rectangle: (self.x, self.y, self.width, self.height)
+                        rounded_rectangle: (self.x, self.y, self.width, self.height, self.height/2)
 
                 # Indicador Salida (Azul)
                 MDBoxLayout:
@@ -114,47 +114,16 @@
             x_ticks_minor: 5
             y_ticks_minor: 5
 
-    # Panel inferior de datos: Quitamos la altura fija de 60dp
+    # Panel inferior de datos
     MDBoxLayout:
         size_hint_y: None
         height: self.minimum_height
-        orientation: 'vertical'
+        orientation: 'horizontal'
         padding: [dp(15), dp(10)]
         spacing: dp(10)
         radius: [dp(15),]
         elevation: 1
         md_bg_color: [1,1,1,1]
-
-        MDLabel:
-            text: "SELECTED POINT"
-            theme_text_color: "Primary"
-            font_style: "Button"
-            halign: "center"
-            size_hint_y: None
-            height: dp(20)
-
-        MDBoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
-            height: dp(20)
-            spacing: dp(20)
-
-            MDLabel:
-                id: lbl_punto_x
-                text: "Time: --- s"
-                halign: "center"
-                font_style: "Caption"
-                theme_text_color: "Secondary"
-
-            MDLabel:
-                id: lbl_punto_y
-                text: "Output: --- rad/s"
-                halign: "center"
-                font_style: "Caption"
-                theme_text_color: "Secondary"
-
-        MDSeparator:
-            height: dp(1)
 
         MDFillRoundFlatButton:
             icon: "content-save"
@@ -172,3 +141,48 @@
                     width: dp(1)
                     rounded_rectangle: (self.x, self.y, self.width, self.height, self.height/2)
             on_release: root.disparar_guardado()
+
+        Widget:
+            size_hint_x: 0.9
+
+        MDCard:
+            orientation: 'vertical'
+            size_hint_x: 0.3
+            md_bg_color: app.color_fondo_suave
+            radius: [dp(15),]     
+            elevation: 0           
+            padding: dp(10)
+            spacing: dp(10)
+
+            MDLabel:
+                text: "SELECTED POINT"
+                theme_text_color: "Primary"
+                font_style: "Button"
+                font_size: dp(20)
+                halign: "center"
+                size_hint_y: None
+                height: dp(20)
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(20)
+                spacing: dp(10)
+
+                MDLabel:
+                    id: lbl_punto_x
+                    text: "Time: --- s"
+                    halign: "center"
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+                    font_size: dp(20)
+
+                MDLabel:
+                    id: lbl_punto_y
+                    text: "Output: --- rad/s"
+                    halign: "center"
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+                    font_size: dp(20)
+
+            
