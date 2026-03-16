@@ -44,15 +44,14 @@ def abrir_ventana_interactiva(datos_acumulados, referencia, titulo="Análisis de
     
     plt.figure(titulo, figsize=(9, 5))
 
-    # 1. SALIDA: Puntos azules ('bo') como en MATLAB
-    plt.plot(tiempos, salidas, 'bo', markersize=3, label='Output (Filt)')
+    # 1. SALIDA: 
+    plt.plot(tiempos, salidas, 'b', markersize=3, label='Output (Filt)')
     
     # 2. ENTRADA/REFERENCIA: Puntos rojos discretos alineados con el tiempo
     if referencia is not None:
         # Creamos un vector de la referencia con el mismo tiempo que la salida
-        # 'r.' crea puntos rojos pequeños, '.' es más fino que 'o'
         referencia_vector = [referencia] * len(tiempos)
-        plt.plot(tiempos, referencia_vector, 'ro', markersize=2, label='Reference')
+        plt.plot(tiempos, referencia_vector, 'r', markersize=2, label='Reference')
 
     # Configuración de ejes (Estilo MATLAB)
     plt.xlabel('t(s)')

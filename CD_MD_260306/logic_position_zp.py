@@ -24,7 +24,7 @@ class ModoPositionZP(BoxLayout):
 
     def _insertar_ecuacion(self, dt):
         # Definimos la fórmula
-        formula = r'R(s) = k \cdot \frac{s + c}{s + p} \cdot \frac{s + c_i}{s + p_i}'
+        formula = r'R(z) = k \cdot \frac{z - c}{z - p} \cdot \frac{z - c_i}{z - p_i}'
         widget_latex = crear_ecuacion_latex(formula, altura='90dp')
         self.ids.contenedor_export_latex.add_widget(widget_latex)
     

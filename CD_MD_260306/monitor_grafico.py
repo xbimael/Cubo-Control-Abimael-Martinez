@@ -16,9 +16,9 @@ class MonitorGrafico(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.plot = PointPlot(color=[0, 0.7, 1, 1], point_size=8) 
-        self.plot_ref = PointPlot(color=[1, 0, 0, 1], point_size=7)
-        self.plot_cursor = PointPlot(color=[0, 0.5, 0, 1], point_size=8)
+        self.plot = PointPlot(color=[0, 0.7, 1, 1], point_size=6) 
+        self.plot_ref = PointPlot(color=[1, 0, 0, 1], point_size=6)
+        self.plot_cursor = PointPlot(color=[0, 0.5, 0, 1], point_size=6)
         self.experiment = [] 
         self.ultimos_datos_recibidos = []
         self.ultima_referencia = 0

@@ -24,7 +24,7 @@ class ModoPositionActions(BoxLayout):
 
     def _insertar_ecuacion(self, dt):
         # Definimos la fórmula
-        formula = r'R(s) = k_p + k_i \cdot \frac{1}{s} + k_d \cdot s'
+        formula = r'R(z) = k_p + k_i \cdot \frac{1}{1 - z^{-1}} + k_d \cdot (1 - z^{-1})'
         widget_latex = crear_ecuacion_latex(formula, altura='90dp')
         self.ids.contenedor_export_latex.add_widget(widget_latex)
 

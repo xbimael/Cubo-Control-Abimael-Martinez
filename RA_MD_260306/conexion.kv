@@ -1,7 +1,7 @@
 <ConexionWidget>:
     MDBoxLayout:
         orientation: 'vertical'
-        size_hint_x: 0.8
+        size_hint_x: 0.75
         spacing: dp(2)        # Espacio mínimo entre título y subtítulo
         padding: [dp(20), 0, 0, 0] # Margen a la izquierda para que no pegue al borde
         pos_hint: {"center_y": .5}
@@ -17,7 +17,7 @@
 
         MDLabel:
             text: "Automation Control"
-            font_style: "Overline"     
+            font_style: "H6"     
             theme_text_color: "Custom"
             text_color: app.color_borde
             size_hint_y: None
@@ -27,7 +27,7 @@
     MDCard:
         id: panel_superior
         orientation: 'vertical'
-        size_hint_x: 0.3
+        size_hint_x: 0.25
         radius: [self.height/2,]     
         elevation: 0           
         padding: dp(10)
@@ -40,9 +40,7 @@
             MDFillRoundFlatButton:
                 id: selector_puerto
                 text: "SELECT SERIAL PORT"
-                size_hint_y: None
-                height: dp(48) # Altura estándar de Material Design
-                size_hint_x: 1 # Ocupa todo el ancho disponible
+                size_hint_x: 1
                 md_bg_color: 0,0,0,0
                 text_color: app.color_resaltado
                 canvas.after:
