@@ -24,7 +24,7 @@ class ModoOpenLoop(BoxLayout):
         try:
             v = float(v_input)
             self.referencia_actual = v
-            u = v * 255 / 12
+            u = v
             tsim = float(t_sim)
             tsam = config.t_sam * 1000
             
