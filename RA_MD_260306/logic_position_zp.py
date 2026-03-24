@@ -35,6 +35,7 @@ class ModoPositionZP(BoxLayout):
         
         try:
             # Convertir inputs
+            isDigital = config.isDigital
             tsim = float(t_sim)
             tsam = config.t_sam * 1000
             k_val = float(k)
@@ -42,9 +43,9 @@ class ModoPositionZP(BoxLayout):
             p_val = float(p)
             ci_val = float(ci)
             pi_val = float(pi)
-            ref_v = float(ref)
+            ref_p = float(ref)
 
-            self.referencia_actual = ref_v
+            self.referencia_actual = ref_p
             self.tsim_limite = tsim
             self.datos_acumulados = []
             self.ids.grafico_ensayo.limpiar_grafica(x_max=tsim)
@@ -56,16 +57,16 @@ class ModoPositionZP(BoxLayout):
             arduino.ser.reset_input_buffer()
             
             # Protocolo de comunicación (Modo 6)
-            # MATLAB envía: Modo, Ref, Tsim, Tsam, K, C, P, Ci, Pi
             arduino.ser.write(b"6\n")
             time.sleep(0.05)
-            for val in [ref_v, tsim, tsam, k_val, c_val, p_val, ci_val, pi_val]:
+            for val in [isDigital, ref_p, tsim, tsam, k_val, c_val, p_val, ci_val, pi_val]:
                 arduino.ser.write(f"{val}\n".encode())
+                print(f"Enviado al Arduino: {val}")
                 time.sleep(0.02)
             
             # Iniciar lectura de datos
             Clock.unschedule(self.leer_datos)
-            Clock.schedule_interval(self.leer_datos, 0.005) # 5ms
+            Clock.schedule_interval(self.leer_datos, 0.001) # 5ms
             
         except ValueError:
             print("Error: Parámetros inválidos")

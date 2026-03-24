@@ -35,6 +35,7 @@ class ModoVelocityActions(BoxLayout):
 
         try:
             # 1. Convertimos valores de la interfaz
+            isDigital = 1
             tsim = float(t_sim)
             tsam = float(t_sam) * 1000
             kp_v = float(kp)
@@ -54,36 +55,12 @@ class ModoVelocityActions(BoxLayout):
             arduino = self.conexion_ref.arduino
             arduino.ser.reset_input_buffer()
             
-            # Protocolo: orden y formato de MATLAB
-            # fprintf(app.sp,'%i\n',operationMode);
+            # Protocolo: orden y formato específico para Modo 3 (Control PID)
             arduino.ser.write(b"3\n")
-            time.sleep(0.05) # Pausa necesaria para no saturar
-            
-            # fprintf(app.sp,'%f\n',vref);
-            arduino.ser.write(f"{ref_v}\n".encode())
-            time.sleep(0.02)
-            
-            # fprintf(app.sp,'%i\n',tsim);
-            arduino.ser.write(f"{int(tsim)}\n".encode())
-            time.sleep(0.02)
-
-            # fprintf(app.sp,'%i\n',tsam);
-            arduino.ser.write(f"{int(tsam)}\n".encode())
-            time.sleep(0.02)
-            
-            # fprintf(app.sp,'%f\n',kp);
-            arduino.ser.write(f"{kp_v}\n".encode())
-            time.sleep(0.02)
-            
-            # fprintf(app.sp,'%f\n',ki);
-            arduino.ser.write(f"{ki_v}\n".encode())
-            time.sleep(0.02)
-            
-            # fprintf(app.sp,'%f\n',kd);
-            arduino.ser.write(f"{kd_v}\n".encode())
-            time.sleep(0.02)
-            
-            print("Parámetros enviados secuencialmente según protocolo MATLAB.")
+            time.sleep(0.05)
+            for val in [isDigital, ref_v, tsim, tsam, kp_v, ki_v, kd_v]:
+                arduino.ser.write(f"{val}\n".encode())
+                time.sleep(0.02)
             
             # --- RECEPCIÓN ---
             Clock.unschedule(self.leer_datos)

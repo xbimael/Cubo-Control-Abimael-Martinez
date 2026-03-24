@@ -26,7 +26,7 @@ class ModoOpenLoop(BoxLayout):
             self.referencia_actual = v
             u = v
             tsim = float(t_sim)
-            tsam = config.t_sam * 1000
+            tsam = config.t_sam
             
             self.tsim_limite = tsim
             self.tiempo_actual = 0
@@ -80,7 +80,6 @@ class ModoOpenLoop(BoxLayout):
             tiempos = [p[0] for p in self.datos_acumulados]
             salidas = [p[1] for p in self.datos_acumulados]
             voltajes = [p[2] * 12 / 255 for p in self.datos_acumulados]
-            
             try:
                 filtrados = savgol_filter(salidas, window_length=13, polyorder=1, mode='interp')
             except Exception as e:

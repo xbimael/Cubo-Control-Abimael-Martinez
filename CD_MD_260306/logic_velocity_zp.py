@@ -52,6 +52,7 @@ class ModoVelocityZP(BoxLayout):
 
         try:
             # Convertimos valores de la interfaz
+            isDigital = 1
             tsim = float(t_sim)
             tsam = float(t_sam) * 1000
             k_v = float(k)
@@ -77,7 +78,7 @@ class ModoVelocityZP(BoxLayout):
             # MATLAB envía: Modo, Ref, Tsim, Tsam, K, C, P, Ci, Pi
             arduino.ser.write(b"4\n")
             time.sleep(0.05)
-            for val in [ref_v, tsim, tsam, k_v, c_v, p_v, ci_v, pi_v]:
+            for val in [isDigital, ref_v, tsim, tsam, k_v, c_v, p_v, ci_v, pi_v]:
                 arduino.ser.write(f"{val}\n".encode())
                 time.sleep(0.02)
             

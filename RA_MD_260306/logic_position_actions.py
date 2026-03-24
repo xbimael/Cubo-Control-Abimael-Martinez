@@ -35,14 +35,15 @@ class ModoPositionActions(BoxLayout):
         
         try:
             # Convertir inputs
+            isDigital = config.isDigital
             tsim = float(t_sim)
             tsam = config.t_sam * 1000
             k_p = float(kp)
             k_i = float(ki)
             k_d = float(kd)
-            ref_v = float(ref)
+            ref_p = float(ref)
 
-            self.referencia_actual = ref_v
+            self.referencia_actual = ref_p
             self.tsim_limite = tsim
             self.datos_acumulados = []
             self.ids.grafico_ensayo.limpiar_grafica(x_max=tsim)
@@ -54,16 +55,15 @@ class ModoPositionActions(BoxLayout):
             arduino.ser.reset_input_buffer()
             
             # Protocolo de comunicación (Modo 5)
-            # MATLAB envía: Modo, Ref, Tsim, Tsam, Kp, Kd, Ki
             arduino.ser.write(b"5\n")
             time.sleep(0.05)
-            for val in [ref_v, tsim, tsam, k_p, k_d, k_i]:
+            for val in [isDigital, ref_p, tsim, tsam, k_p, k_i, k_d]:
                 arduino.ser.write(f"{val}\n".encode())
                 time.sleep(0.02)
             
             # Iniciar lectura de datos
             Clock.unschedule(self.leer_datos)
-            Clock.schedule_interval(self.leer_datos, 0.005) # 5ms
+            Clock.schedule_interval(self.leer_datos, 0.001) # 5ms
             
         except ValueError:
             print("Error: Parámetros inválidos")

@@ -18,7 +18,7 @@ class MonitorGrafico(BoxLayout):
         super().__init__(**kwargs)
         self.plot = LinePlot(color=[0, 0.7, 1, 1], line_width=2) 
         self.plot_ref = LinePlot(color=[1, 0, 0, 1], line_width=2)
-        self.plot_cursor = PointPlot(color=[0, 0.5, 0, 1], point_size=8)
+        self.plot_cursor = PointPlot(color=[0, 0.5, 0, 1], point_size=6)
         self.experiment = [] 
         self.ultimos_datos_recibidos = []
         self.ultima_referencia = 0
@@ -68,18 +68,18 @@ class MonitorGrafico(BoxLayout):
     def actualizar_datos_completos(self, tiempos, voltajes, salidas, filtrados, ref_val=None):
         self.experiment = list(zip(tiempos, voltajes, salidas, filtrados))
         
-        # 1. Dibujamos la señal principal como puntos ("o")
+        # 1. Actualizamos la referencia ANTES de dibujar
+        self.ultima_referencia = ref_val
+
+        # 2. Ahora dibujar_lote ya lee el valor correcto
         self.dibujar_lote(list(zip(tiempos, filtrados)))
 
-        # 2. Manejo de la Referencia Punteada
         if ref_val is not None and tiempos:
             self.plot_ref.points = [(t, ref_val) for t in tiempos]
         else:
             self.plot_ref.points = []
 
-        # 3. Guardado para histórico y exportación
         self.ultimos_datos_recibidos = list(zip(tiempos, filtrados))
-        self.ultima_referencia = ref_val
 
     def actualizar_marcas(self):
         if not self.graph: return
@@ -96,40 +96,56 @@ class MonitorGrafico(BoxLayout):
         # --- EJE Y (Amplitud) ---
         rango_y = self.graph.ymax - self.graph.ymin
         # Ajustamos para que salgan más etiquetas en el eje Y
-        if rango_y <= 1.5: 
-            self.graph.y_ticks_major = 0.1  # Salen etiquetas cada 0.1
-        elif rango_y <= 5: 
-            self.graph.y_ticks_major = 0.5  # Salen etiquetas cada 0.5
-        elif rango_y <= 20: 
-            self.graph.y_ticks_major = 2    # Salen etiquetas cada 2
-        elif rango_y <= 50: 
-            self.graph.y_ticks_major = 5    # Salen etiquetas cada 5
-        else: 
-            self.graph.y_ticks_major = 10   # Salen etiquetas cada 10   
+        self.graph.y_ticks_major = rango_y/10 if rango_y > 0 else -rango_y/10
 
-    def añadir_punto(self, x, y):
-        self.plot.points.append((x, y))
-        cambio = False
-        if x > self.graph.xmax:
-            self.graph.xmax = x
-            cambio = True
-        if y > self.graph.ymax:
-            self.graph.ymax = math.ceil(y / 5.0) * 5
-            cambio = True
-        if y < self.graph.ymin:
-            self.graph.ymin = math.floor(y / 5.0) * 5
-            cambio = True
-        if cambio:
-            self.actualizar_marcas()
+    def _calcular_limites_y(self, valores_y, referencia=None, margen_relativo=0.15):
+        if not valores_y:
+            return 0, 1
+
+        raw_min = min(valores_y)
+        raw_max = max(valores_y)
+        rango = raw_max - raw_min or 1
+
+        margen = rango * margen_relativo
+        lim_min = raw_min - margen
+        lim_max = raw_max + margen
+
+        magnitud = 10 ** math.floor(math.log10(rango))
+        paso = magnitud if rango / magnitud < 5 else magnitud * 2
+
+        lim_min = math.floor(lim_min / paso) * paso
+        lim_max = math.ceil(lim_max / paso) * paso
+
+        # Solo expandimos si la referencia queda fuera, sin recalcular márgenes
+        if referencia is not None:
+            if referencia < lim_min:
+                lim_min = math.floor(referencia / paso) * paso
+            elif referencia > lim_max:
+                lim_max = math.ceil(referencia / paso) * paso
+
+        return lim_min, lim_max
 
     def dibujar_lote(self, lista_puntos):
         self.plot.points = lista_puntos
         if lista_puntos:
-            max_y = max(p[1] for p in lista_puntos)
-            min_y = min(p[1] for p in lista_puntos)
-            self.graph.ymax = math.ceil(max(1, max_y) / 5.0) * 5
-            self.graph.ymin = math.floor(min(0, min_y) / 5.0) * 5
+            ys = [p[1] for p in lista_puntos]
+            self.graph.ymin, self.graph.ymax = self._calcular_limites_y(ys, self.ultima_referencia)
             self.actualizar_marcas()
+
+    def añadir_punto(self, x, y):
+        self.plot.points.append((x, y))
+        ys = [p[1] for p in self.plot.points]
+        nuevo_min, nuevo_max = self._calcular_limites_y(ys, self.ultima_referencia)
+
+        # Histéresis: solo actualiza si el cambio es significativo (>5%)
+        rango_actual = self.graph.ymax - self.graph.ymin or 1
+        if (abs(nuevo_min - self.graph.ymin) > rango_actual * 0.05 or
+                abs(nuevo_max - self.graph.ymax) > rango_actual * 0.05):
+            self.graph.ymin, self.graph.ymax = nuevo_min, nuevo_max
+
+        if x > self.graph.xmax:
+            self.graph.xmax = x
+        self.actualizar_marcas()
 
     def disparar_guardado(self):
         # 1. Verificamos si tenemos datos en 'experiment' (que ya llenamos en actualizar_datos_completos)

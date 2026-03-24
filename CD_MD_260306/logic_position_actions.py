@@ -34,6 +34,7 @@ class ModoPositionActions(BoxLayout):
         
         try:
             # Convertir inputs
+            isDigital = 1
             tsim = float(t_sim)
             tsam = float(t_sam) * 1000
             k_p = float(kp)
@@ -56,7 +57,7 @@ class ModoPositionActions(BoxLayout):
             # MATLAB envía: Modo, Ref, Tsim, Tsam, Kp, Kd, Ki
             arduino.ser.write(b"5\n")
             time.sleep(0.05)
-            for val in [ref_v, tsim, tsam, k_p, k_d, k_i]:
+            for val in [isDigital, ref_v, tsim, tsam, k_p, k_i, k_d]:
                 arduino.ser.write(f"{val}\n".encode())
                 time.sleep(0.02)
             

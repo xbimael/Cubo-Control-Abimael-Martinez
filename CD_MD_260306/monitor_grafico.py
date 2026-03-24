@@ -16,9 +16,9 @@ class MonitorGrafico(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.plot = PointPlot(color=[0, 0.7, 1, 1], point_size=6) 
-        self.plot_ref = PointPlot(color=[1, 0, 0, 1], point_size=6)
-        self.plot_cursor = PointPlot(color=[0, 0.5, 0, 1], point_size=6)
+        self.plot = PointPlot(color=[0, 0.7, 1, 1], point_size=4) 
+        self.plot_ref = PointPlot(color=[1, 0, 0, 1], point_size=3)
+        self.plot_cursor = PointPlot(color=[0, 0.5, 0, 1], point_size=4.5)
         self.experiment = [] 
         self.ultimos_datos_recibidos = []
         self.ultima_referencia = 0
@@ -31,9 +31,9 @@ class MonitorGrafico(BoxLayout):
         if self.ids.graph_id:
             self.graph = self.ids.graph_id
             # Limpiamos para evitar duplicados si pulsas "Ejecutar" varias veces
-            self.graph.plots = [] 
+            self.graph.plots = []
+            self.graph.add_plot(self.plot_ref) 
             self.graph.add_plot(self.plot)
-            self.graph.add_plot(self.plot_ref)
             print("Plots añadidos correctamente")
 
     # Este método se asegura de que el Graph se actualice al cambiar la propiedad
@@ -68,18 +68,17 @@ class MonitorGrafico(BoxLayout):
     def actualizar_datos_completos(self, tiempos, voltajes, salidas, filtrados, ref_val=None):
         self.experiment = list(zip(tiempos, voltajes, salidas, filtrados))
         
-        # 1. Dibujamos la señal principal como puntos ("o")
+        # Primero actualizamos la referencia
+        self.ultima_referencia = ref_val
+
         self.dibujar_lote(list(zip(tiempos, filtrados)))
 
-        # 2. Manejo de la Referencia Punteada
         if ref_val is not None and tiempos:
             self.plot_ref.points = [(t, ref_val) for t in tiempos]
         else:
             self.plot_ref.points = []
 
-        # 3. Guardado para histórico y exportación
         self.ultimos_datos_recibidos = list(zip(tiempos, filtrados))
-        self.ultima_referencia = ref_val
 
     def actualizar_marcas(self):
         if not self.graph: return
@@ -107,6 +106,39 @@ class MonitorGrafico(BoxLayout):
         else: 
             self.graph.y_ticks_major = 10   # Salen etiquetas cada 10   
 
+    def _calcular_limites_y(self, valores_y, referencia=None, margen_relativo=0.15):
+        if not valores_y:
+            return 0, 1
+
+        raw_min = min(valores_y)
+        raw_max = max(valores_y)
+        rango = raw_max - raw_min or 1
+
+        margen = rango * margen_relativo
+        lim_min = raw_min - margen
+        lim_max = raw_max + margen
+
+        magnitud = 10 ** math.floor(math.log10(rango))
+        paso = magnitud if rango / magnitud < 5 else magnitud * 2
+
+        lim_min = math.floor(lim_min / paso) * paso
+        lim_max = math.ceil(lim_max / paso) * paso
+
+        if referencia is not None:
+            if referencia < lim_min:
+                lim_min = math.floor(referencia / paso) * paso
+            elif referencia > lim_max:
+                lim_max = math.ceil(referencia / paso) * paso
+
+        return lim_min, lim_max
+
+    def dibujar_lote(self, lista_puntos):
+        self.plot.points = lista_puntos
+        if lista_puntos:
+            ys = [p[1] for p in lista_puntos]
+            self.graph.ymin, self.graph.ymax = self._calcular_limites_y(ys, self.ultima_referencia)
+            self.actualizar_marcas()
+
     def añadir_punto(self, x, y):
         self.plot.points.append((x, y))
         cambio = False
@@ -119,16 +151,16 @@ class MonitorGrafico(BoxLayout):
         if y < self.graph.ymin:
             self.graph.ymin = math.floor(y / 5.0) * 5
             cambio = True
-        if cambio:
-            self.actualizar_marcas()
 
-    def dibujar_lote(self, lista_puntos):
-        self.plot.points = lista_puntos
-        if lista_puntos:
-            max_y = max(p[1] for p in lista_puntos)
-            min_y = min(p[1] for p in lista_puntos)
-            self.graph.ymax = math.ceil(max(1, max_y) / 5.0) * 5
-            self.graph.ymin = math.floor(min(0, min_y) / 5.0) * 5
+        if self.ultima_referencia is not None:
+            if self.ultima_referencia > self.graph.ymax:
+                self.graph.ymax = math.ceil(self.ultima_referencia / 5.0) * 5
+                cambio = True
+            elif self.ultima_referencia < self.graph.ymin:
+                self.graph.ymin = math.floor(self.ultima_referencia / 5.0) * 5
+                cambio = True
+
+        if cambio:
             self.actualizar_marcas()
 
     def disparar_guardado(self):
