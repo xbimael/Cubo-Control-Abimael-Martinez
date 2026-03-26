@@ -26,7 +26,7 @@ class ModoOpenLoop(BoxLayout):
             self.referencia_actual = v
             u = v
             tsim = float(t_sim)
-            tsam = config.t_sam
+            tsam = config.t_sam * 1000
             
             self.tsim_limite = tsim
             self.tiempo_actual = 0

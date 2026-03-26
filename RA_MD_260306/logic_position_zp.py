@@ -61,7 +61,6 @@ class ModoPositionZP(BoxLayout):
             time.sleep(0.05)
             for val in [isDigital, ref_p, tsim, tsam, k_val, c_val, p_val, ci_val, pi_val]:
                 arduino.ser.write(f"{val}\n".encode())
-                print(f"Enviado al Arduino: {val}")
                 time.sleep(0.02)
             
             # Iniciar lectura de datos

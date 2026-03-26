@@ -83,28 +83,53 @@ class MonitorGrafico(BoxLayout):
     def actualizar_marcas(self):
         if not self.graph: return
         
+        # Desactivamos los ticks menores para evitar el crash de IndexError
+        self.graph.y_ticks_minor = 0
+        self.graph.x_ticks_minor = 0
+        
+        rango_y = self.graph.ymax - self.graph.ymin
+        
+        # Seguridad extrema: si el rango es absurdo o muy pequeño, 
+        # reseteamos a algo manejable
+        if rango_y < 0.001:
+            self.graph.y_ticks_major = 1
+            return
+
+        # Calculamos el tick para que SIEMPRE haya solo 5 divisiones
+        # Esto es lo más seguro para evitar el IndexError
+        self.graph.y_ticks_major = rango_y / 5
+        
         # --- EJE X (Tiempo) ---
         rango_x = self.graph.xmax - self.graph.xmin
-        # Ajustamos para tener aprox 10 valores en el eje X
-        if rango_x <= 2: self.graph.x_ticks_major = 0.2
-        elif rango_x <= 5: self.graph.x_ticks_major = 0.5
-        elif rango_x <= 15: self.graph.x_ticks_major = 1
-        elif rango_x <= 30: self.graph.x_ticks_major = 2
-        else: self.graph.x_ticks_major = 5
+        if rango_x > 0:
+            # Dividimos por 10 para asegurar unas 10 etiquetas
+            # Usamos max(0.1, ...) para que no intente poner ticks microscópicos
+            self.graph.x_ticks_major = max(0.1, self._redondear_tick(rango_x / 10))
 
         # --- EJE Y (Amplitud) ---
         rango_y = self.graph.ymax - self.graph.ymin
-        # Ajustamos para que salgan más etiquetas en el eje Y
-        if rango_y <= 1.5: 
-            self.graph.y_ticks_major = 0.1  # Salen etiquetas cada 0.1
-        elif rango_y <= 5: 
-            self.graph.y_ticks_major = 0.5  # Salen etiquetas cada 0.5
-        elif rango_y <= 20: 
-            self.graph.y_ticks_major = 2    # Salen etiquetas cada 2
-        elif rango_y <= 50: 
-            self.graph.y_ticks_major = 5    # Salen etiquetas cada 5
-        else: 
-            self.graph.y_ticks_major = 10   # Salen etiquetas cada 10   
+        if rango_y > 0:
+            # ESTA ES LA CLAVE: 
+            # El tick es el rango dividido por 10. Si el rango es 500, el tick es 50.
+            # Así Kivy solo dibuja 10 líneas y no da IndexError.
+            self.graph.y_ticks_major = max(0.001, self._redondear_tick(rango_y / 10))
+        else:
+            self.graph.y_ticks_major = 1
+
+    def _redondear_tick(self, valor):
+        """Función auxiliar para que los ticks sean números 'limpios'"""
+        if valor <= 0: return 1
+        # Obtenemos la magnitud (potencia de 10)
+        exponente = math.floor(math.log10(valor))
+        mantisa = valor / (10 ** exponente)
+        
+        # Redondeamos la mantisa a valores comunes en gráficas
+        if mantisa < 1.5: mantisa = 1
+        elif mantisa < 3: mantisa = 2
+        elif mantisa < 7: mantisa = 5
+        else: mantisa = 10
+        
+        return mantisa * (10 ** exponente)  
 
     def _calcular_limites_y(self, valores_y, referencia=None, margen_relativo=0.15):
         if not valores_y:
@@ -140,25 +165,43 @@ class MonitorGrafico(BoxLayout):
             self.actualizar_marcas()
 
     def añadir_punto(self, x, y):
+        # 1. Validación de seguridad (evita que NaN o Infinito rompan el gráfico)
+        if not math.isfinite(y):
+            return
+
         self.plot.points.append((x, y))
         cambio = False
+
+        # --- AJUSTE EJE X ---
         if x > self.graph.xmax:
             self.graph.xmax = x
             cambio = True
-        if y > self.graph.ymax:
-            self.graph.ymax = math.ceil(y / 5.0) * 5
-            cambio = True
-        if y < self.graph.ymin:
-            self.graph.ymin = math.floor(y / 5.0) * 5
-            cambio = True
 
-        if self.ultima_referencia is not None:
-            if self.ultima_referencia > self.graph.ymax:
-                self.graph.ymax = math.ceil(self.ultima_referencia / 5.0) * 5
-                cambio = True
-            elif self.ultima_referencia < self.graph.ymin:
-                self.graph.ymin = math.floor(self.ultima_referencia / 5.0) * 5
-                cambio = True
+        # --- AJUSTE EJE Y (Dinámico con margen del 10%) ---
+        # Determinamos los límites actuales considerando la referencia
+        v_ref = self.ultima_referencia if self.ultima_referencia is not None else y
+        
+        # Si el nuevo punto o la referencia se salen de lo que vemos ahora:
+        if y > self.graph.ymax or y < self.graph.ymin or v_ref > self.graph.ymax or v_ref < self.graph.ymin:
+            # Buscamos los extremos reales entre el punto actual y la referencia
+            extremo_max = max(y, v_ref)
+            extremo_min = min(y, v_ref)
+            
+            rango_actual = extremo_max - extremo_min
+            # Margen del 10% (si es 0, usamos 1 para que no colapse)
+            margen = rango_actual * 0.1 if rango_actual > 0 else 1
+            
+            # Aplicamos los nuevos límites
+            self.graph.ymax = extremo_max + margen
+            
+            # Solo bajamos el ymin de 0 si el valor realmente es negativo
+            nuevo_ymin = extremo_min - margen
+            if extremo_min >= 0 and nuevo_ymin < 0:
+                self.graph.ymin = 0
+            else:
+                self.graph.ymin = nuevo_ymin
+                
+            cambio = True
 
         if cambio:
             self.actualizar_marcas()

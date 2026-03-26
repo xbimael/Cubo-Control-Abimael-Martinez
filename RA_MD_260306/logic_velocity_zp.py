@@ -61,7 +61,7 @@ class ModoVelocityZP(BoxLayout):
             p_v = float(p)
             ci_v = float(ci)
             pi_v = float(pi)
-            ref_v = float(ref) # Voltios
+            ref_v = float(ref) 
             
             
             self.referencia_actual = ref_v
