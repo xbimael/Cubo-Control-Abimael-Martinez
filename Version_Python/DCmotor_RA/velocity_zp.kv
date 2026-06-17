@@ -1,0 +1,136 @@
+#:import MonitorGrafico monitor_grafico.MonitorGrafico
+
+<ModoVelocityZP>:
+    grafica_ref: grafico_ensayo
+    orientation: 'horizontal'
+    spacing: dp(15)
+    padding: dp(20)
+
+    MDCard:
+        id: panel_izquierdo
+        orientation: 'vertical'
+        size_hint_x: 0.4
+        md_bg_color: app.color_fondo_suave
+        radius: [dp(15),]     
+        elevation: 0           
+        padding: dp(15)
+        spacing: dp(10)
+
+        MDLabel:
+            text: "VELOCITY CONTROL (ZEROS/POLES)"
+            size_hint_y: None
+            height: dp(40)
+            halign: "center"
+            font_style: "H6"
+            theme_text_color: "Primary"
+
+        Widget:
+            size_hint_y: 0.01
+            
+        MDLabel:
+            text: "This operation mode allows you to control the DC-motor by means of a PID controller defining its ceros and poles."
+            halign: "justify"
+            font_style: "Body2"
+            theme_text_color: "Secondary" # Gris profesional, no distrae
+            size_hint_y: None
+            height: self.texture_size[1] # Se ajusta solo al tamaño del texto
+            padding: [dp(10), 0]
+
+        Widget:
+            size_hint_y: 0.02
+
+        # Contenedor para la fórmula LaTeX
+        MDBoxLayout:
+            id: contenedor_export_latex
+            size_hint_y: None
+            height: dp(90)
+            padding: dp(5)
+            md_bg_color: (0, 0, 0, 0.1)
+            radius: [dp(10),]
+            
+        Widget:
+            size_hint_y: 0.02
+
+        # Parámetros del Controlador en Grid
+        MDGridLayout:
+            cols: 2
+            spacing: dp(12)
+            size_hint_y: None
+            height: self.minimum_height
+            md_bg_color: app.color_fondo_suave
+
+            MDTextField:
+                id: k_input
+                text: "1"
+                hint_text: "Gain, K"
+                mode: "rectangle"
+                icon_left: 'blank'
+                input_filter: 'float'
+
+            MDTextField:
+                id: c_input
+                text: "0"
+                hint_text: "Zero, C"
+                mode: "rectangle"
+                icon_left: 'blank'
+                input_filter: 'float'
+
+            MDTextField:
+                id: p_input
+                text: "0"
+                hint_text: "Pole, P"
+                mode: "rectangle"
+                icon_left: 'blank'
+                input_filter: 'float'
+
+            MDTextField:
+                id: ci_input
+                text: "0"
+                hint_text: "Zero, Ci"
+                mode: "rectangle"
+                icon_left: 'blank'
+                input_filter: 'float'
+
+            MDTextField:
+                id: pi_input
+                text: "0"
+                hint_text: "Pole, Pi"
+                mode: "rectangle"
+                icon_left: 'blank'
+                input_filter: 'float'
+
+            MDTextField:
+                id: ref_input
+                text: "3.14"
+                hint_text: "Velocity reference (rad/s)"
+                mode: "rectangle"
+                icon_left: "speedometer"
+                input_filter: 'float'
+
+        MDTextField:
+            id: t_input
+            text: "3"
+            hint_text: "Experiment time (s)"
+            mode: "rectangle"
+            icon_left: "timer-sand"
+            input_filter: 'float'
+
+        MDFloatLayout:
+            size_hint_y: 1
+
+        # Botón de ejecución
+        MDFillRoundFlatButton:
+            id: btn_ejecutar
+            text: "EXECUTE"
+            font_style: "Button"
+            elevation: 0          
+            md_bg_color: app.color_resaltado
+            text_color: 1, 1, 1, 1 
+            on_release: root.ejecutar_velocity_zp(k_input.text, c_input.text, p_input.text, ci_input.text, pi_input.text, ref_input.text, t_input.text)
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        MonitorGrafico:
+            id: grafico_ensayo
+            unidad_y: "rad/s"
+            size_hint_y: 0.6
